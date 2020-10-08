@@ -8,6 +8,9 @@ import java.util.ArrayList;
 
 public class ChatClientUI {
     JFrame window;
+    Client client;
+    JList chatHistory;
+    ArrayList<String> chatHistoryData;
 
     public ChatClientUI() {
         window = new JFrame("Chat Client");
@@ -16,6 +19,8 @@ public class ChatClientUI {
 
         Container content = window.getContentPane();
         content.setLayout(new GridBagLayout());
+
+        chatHistoryData = new ArrayList<>();
 
         //ui elements
         createUI();
@@ -35,10 +40,20 @@ public class ChatClientUI {
             public void actionPerformed(ActionEvent actionEvent) {
                 System.out.println("Connecting with " + serverAddress.getText());
 
+                client = new Client(serverAddress.getText(), new MessageListener() {
+                    @Override
+                    public void message(String msg, MessageSender sender) {
+                        // add the new message to the chat history
+                        chatHistoryData.add(msg);
+                        chatHistory.setListData(chatHistoryData.toArray());
+
+                    }
+                });
+
             }
         });
 
-        JList chatHistory = new JList();
+        chatHistory = new JList();
         addComponent(chatHistory,0,2,2,1,1f,1f);
 
         JTextField chatBox = new JTextField();
@@ -49,7 +64,11 @@ public class ChatClientUI {
         send.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                System.out.println("Sending..." + chatBox.getText());
+                //System.out.println("Sending..." + chatBox.getText());
+                if (client !=null) {
+                    client.sendMessage(chatBox.getText());
+                }
+                chatBox.setText("");
             }
         });
 
