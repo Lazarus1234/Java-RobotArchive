@@ -181,11 +181,11 @@ public class ArchiveConsole {
         JButton Retrieve = new JButton("Retrieve");
         addComponent(panel, Retrieve,GridBagConstraints.HORIZONTAL,2,1,2,1,50.0f,10f);
         JButton Remove = new JButton("Remove");
-        addComponent(panel, Remove,GridBagConstraints.HORIZONTAL,4,1,1,1,30f,10f);
+        addComponent(panel, Remove,GridBagConstraints.HORIZONTAL,4,1,1,1,30f,10f, new Insets(0,0,0,80), GridBagConstraints.NORTH);
         JButton Return = new JButton("Return");
         addComponent(panel, Return,GridBagConstraints.HORIZONTAL,2,2,2,1,50.0f,10f);
         JButton addCollection = new JButton("Add to Collection");
-        addComponent(panel, addCollection,GridBagConstraints.HORIZONTAL,4,2,1,1,30f,10f);
+        addComponent(panel, addCollection,GridBagConstraints.HORIZONTAL,4,2,1,1,30f,10f,new Insets(0,0,0,80), GridBagConstraints.NORTH);
 
         JLabel SortS = new JLabel("Sort Secion: ");
         addComponent(panel,SortS,GridBagConstraints.HORIZONTAL,3,3,2,1,15.0f,50f );
