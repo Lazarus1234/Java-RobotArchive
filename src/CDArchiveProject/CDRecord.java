@@ -15,7 +15,9 @@ public class CDRecord {
     String description;
     boolean onLoan;
 
-    public CDRecord (String title, String author, String section,int x, int y, int barcode, String description, boolean onLoan){
+
+
+    public CDRecord (String title, String author, String section, int x, int y, int barcode, String description, boolean onLoan){
         this.title=title;
         this.author=author;
         this.section=section;
@@ -37,10 +39,8 @@ public class CDRecord {
 
 
 
-    @Override
-    public String toString() {
-        return Integer.toString(this.barcode);
-    }
+
+
 
     public static List<CDRecord> getTestData() {
         CDRecord[] records = new CDRecord[]{
@@ -119,5 +119,20 @@ public class CDRecord {
 
     public int getBarcode() {
         return barcode;
+    }
+
+
+    @Override
+    public String toString() {
+        return "CDRecord{" +
+                "title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                ", section='" + section + '\'' +
+                ", xLocation=" + xLocation +
+                ", yLocation=" + yLocation +
+                ", barcode=" + barcode +
+                ", description='" + description + '\'' +
+                ", onLoan=" + onLoan +
+                '}';
     }
 }
