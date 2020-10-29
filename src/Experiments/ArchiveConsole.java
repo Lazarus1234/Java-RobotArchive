@@ -179,7 +179,7 @@ public class ArchiveConsole {
         addComponent(panel, ProcessLbl, GridBagConstraints.BOTH, 0,0,4,1,100.0f,0.0f);
         JButton Processbtn = new JButton("Process Log");
         addComponent(panel,Processbtn,GridBagConstraints.BOTH , 4,0,1,1,15.0f,0f);
-        JTextArea Process=new JTextArea();
+        JTextField Process=new JTextField();
         addComponent(panel,Process,GridBagConstraints.BOTH,0,1,5,4,20.0f,1.0f);
         JLabel Binary = new JLabel("Display Binary Tree:");
         addComponent(panel,Binary,GridBagConstraints.BOTH,0,9,1,1,15.0f,0f);
@@ -214,8 +214,6 @@ public class ArchiveConsole {
         addComponent(panel, lbltitle,GridBagConstraints.BOTH, 0,0,1,1,1f,20f,new Insets(0,0,1,0),GridBagConstraints.NORTH);
         txttitle = new JTextField();
         addComponent(panel, txttitle,GridBagConstraints.HORIZONTAL,1,0,1,1,10f,20f,new Insets(0,0,1,0),GridBagConstraints.NORTH);
-        JTextArea number = new JTextArea();
-        addComponent(panel,number,GridBagConstraints.HORIZONTAL,2,0,1,1,0f,10f,new Insets(0,0,1,0),GridBagConstraints.NORTH);
         JLabel lblAuthor = new JLabel("Author");
        addComponent(panel, lblAuthor, GridBagConstraints.BOTH,0,1,1,1,0.5f,20f,new Insets(0,0,1,0),GridBagConstraints.NORTH);
         txtauthor = new JTextField();
