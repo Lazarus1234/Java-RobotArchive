@@ -36,9 +36,12 @@ public class BubbleSort {
         while (swapped) {
             swapped =false;
             for (int i = 1; i < records.size(); i++){
-                CDRecord left = records.get(i-1);
-                CDRecord right = records.get(i);
-                if (left.getBarcode() > right.getBarcode()) {
+                CDRecord lefty = records.get(i-1);
+                CDRecord righty = records.get(i);
+                //if (lefty.getBarcode() > righty.getBarcode()) {
+                if (lefty.getTitle().compareTo(righty.getTitle())>0) {
+                    CDRecord left = records.get(i-1);
+                    CDRecord right = records.get(i);
                     records.set(i, left);
                     records.set(i-1, right);
                     swapped = true;
