@@ -6,10 +6,7 @@ import Sorting.Insertion;
 import Sorting.Selection;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -53,6 +50,18 @@ public class ArchiveConsole {
         JButton search = new JButton("Search");
         addComponent(window.getContentPane(),search,GridBagConstraints.VERTICAL,2,0,1,1,10.0f,0.0f);
 
+        final TableRowSorter<CDRecordTableModel> sorter = new TableRowSorter(tableData);
+        search.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String search = searchString.getText();
+                try{
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)"+search));
+                } catch (Exception e){
+                    System.out.println("Error in search: "+e.toString());
+                }
+            }
+        });
         JPanel archiveListPanel = createArchiveListPanel();
         addComponent(window.getContentPane(), archiveListPanel,
         GridBagConstraints.BOTH,0,1,3,1,70.0f,40.0f);
@@ -77,6 +86,13 @@ public class ArchiveConsole {
         JButton Exit = new JButton("Exit");
         addComponent(window.getContentPane(),Exit,GridBagConstraints.BOTH,3,3,2,1,0f,0f);
 
+        Exit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                
+                System.exit(0);
+            }
+        });
     }
 
     private JPanel createArchiveListPanel(){
@@ -150,19 +166,19 @@ public class ArchiveConsole {
         addComponent(panel,sortByTitleButton, GridBagConstraints.VERTICAL,1,2,1,1,0.0f,0.0f, new Insets(0,0,0,10),GridBagConstraints.EAST);
 
         JButton sortByAuthorButton = new JButton("By Author");
-        //sortByAuthorButton.addActionListener(new ActionListener() {
-           // @Override
-            //public void actionPerformed(ActionEvent actionEvent) {
-                //Selection.sort(records);
-               // tableData.fireTableDataChanged();
-           // }
-        //});
+        sortByAuthorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Insertion.sort(records);
+                tableData.fireTableDataChanged();
+            }
+        });
         addComponent(panel,sortByAuthorButton, GridBagConstraints.VERTICAL,2,2,1,1,0.0f,0.0f,new Insets(0,10,0,0),GridBagConstraints.WEST);
         JButton sortByBarcodeButton = new JButton("By Barcode");
         sortByBarcodeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                Insertion.sort(records);
+                Selection.sort(records);
                 tableData.fireTableDataChanged();
             }
         });

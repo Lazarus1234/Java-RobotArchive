@@ -27,7 +27,7 @@ public class Insertion {
             int previousIndex = index -1;
 
             while (previousIndex>=0 &&
-                    records.get(previousIndex).getBarcode() >indexRecord.getBarcode()) {
+                    records.get(previousIndex).getAuthor().compareToIgnoreCase(indexRecord.getAuthor()) >0) {
                CDRecord previousRecord = records.get(previousIndex);
                records.set(previousIndex +1, previousRecord);
                previousIndex--;
