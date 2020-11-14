@@ -1,10 +1,17 @@
 package Experiments;
 
-public class BinaryTree {
+import CDArchiveProject.CDRecord;
+
+import java.util.List;
+
+public class BinaryTreeEXP {
 
     Node root;
+    List<CDRecord> records;
 
-    public void addNode(int key, String name) {
+
+
+    /*public void addNode(int key, CDRecord records) {
 
         // Create a new Node and initialize it
 
@@ -74,7 +81,8 @@ public class BinaryTree {
             }
         }
 
-    }
+    }*/
+
 
     // All nodes are visited in ascending order
     // Recursion is used to go to one node and
@@ -166,9 +174,14 @@ public class BinaryTree {
 
     public static void main(String[] args) {
 
+        BinaryTreeEXP tree = new BinaryTreeEXP();
+
+        tree.inOrderTraverseTree(tree.root);
+        System.out.println(tree);
+        /*CDRecord tree =
         BinaryTree theTree = new BinaryTree();
 
-        theTree.addNode(50, "Boss");
+        theTree.addNode();
 
         theTree.addNode(25, "Vice President");
 
@@ -182,7 +195,7 @@ public class BinaryTree {
 
         // Different ways to traverse binary trees
 
-        // theTree.inOrderTraverseTree(theTree.root);
+      theTree.inOrderTraverseTree(theTree.root);
 
         // theTree.preorderTraverseTree(theTree.root);
 
@@ -192,35 +205,59 @@ public class BinaryTree {
 
         System.out.println("\nNode with the key 50");
 
-        System.out.println(theTree.findNode(50));
-
-    }
-}
-
-class Node {
-
-    int key;
-    String name;
-
-    Node leftChild;
-    Node rightChild;
-
-    Node(int key, String name) {
-
-        this.key = key;
-        this.name = name;
+        System.out.println(theTree.findNode(50));*/
 
     }
 
-    public String toString() {
 
-        return name + " has the key " + key;
+    public static class Node<T> {
 
-        /*
-         * return name + " has the key " + key + "\nLeft Child: " + leftChild +
-         * "\nRight Child: " + rightChild + "\n";
-         */
+        int key;
+        T data;
+
+        Node leftChild;
+        Node rightChild;
+
+        Node(int key, T data) {
+
+            this.key = key;
+            this.data = data;
+
+        }
+
+        public Node getLeft() {
+            return this.leftChild;
+        }
+
+        public Node getRight() {
+            return this.rightChild;
+        }
+
+        public int getKey() {
+            return this.key;
+        }
+
+        public T getData() {
+            return this.data;
+        }
+
+        public void setData(T data) {
+            this.data = data;
+        }
+
+
+        @Override
+        public String toString() {
+
+            return this.key + " : " + this.data.toString();
+
+        }
+
 
     }
 
+    public void Insert(Node node) {
+
+
+    }
 }

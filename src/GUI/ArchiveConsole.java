@@ -1,28 +1,58 @@
-package Experiments;
+package GUI;
 import CDArchiveProject.CDRecord;
 import CDArchiveProject.RecordStorage;
+import Experiments.CDRecordTableModel;
+import Sockets.AutomationConsole;
+import Sockets.Client;
+import Sockets.MessageListener;
+import Sockets.MessageSender;
 import Sorting.BubbleSort;
 import Sorting.Insertion;
 import Sorting.Selection;
 
 import javax.swing.*;
+import javax.swing.plaf.synth.Region;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import Trees.BinaryTree;
+import Lists.DoublyLinkedList;
 
 public class ArchiveConsole {
+    //<editor-fold desc="Member Fields">
     JFrame window;
     List<CDRecord> records;
+    BinaryTree tree;
+    DoublyLinkedList Dll = new DoublyLinkedList();
+    JTable cdRecordTable;
+    JTextArea processList;
+    Client client;
+    AutomationConsole Auto;
+    CDRecord selectedRecord;
+    RecordStorage save;
+    HashMap<Integer, String> hashMap = new HashMap<>();
+
+
     AbstractTableModel tableData;
     JTextField txttitle, txtauthor, txtxLoc,txtsection,txtyLoc,txtBarcode,txtdesc;
-    JButton Save, newitem, saveupdate;
+    JButton Save, newitem, saveupdate, Processbtn;
     int selectedIndex = -1;
+    JList Process;
+    boolean prcActive = false;
+    //ArrayList<String> processRecord = new ArrayList<>();
+    //</editor-fold>
 
 
+    //<editor-fold desc="Archive Console">
     public ArchiveConsole() {
         records = RecordStorage.loadRecordList("records.Data");
 
@@ -32,14 +62,24 @@ public class ArchiveConsole {
         window.getContentPane().setLayout(new GridBagLayout());
 
         createUI();
+        client = new Client("localhost:20000", new MessageListener() {
+            @Override
+            public void message(String msg, MessageSender sender) {
+                Dll.append(new DoublyLinkedList.Node("Log entry text:  " + msg + "\n"));
+                processList.setText(Dll.toString() +"\n");
+                processList.setLineWrap(true);
+            }
+        });
 
         window.pack();
         window.setMinimumSize(new Dimension(700,400));
         window.setSize(new Dimension(900,500));
         window.setVisible(true);
     }
+    //</editor-fold>
 
 
+    //<editor-fold desc="User Interface">
     private void createUI(){
         JLabel searchLbl = new JLabel("Search String: ");
         addComponent(window.getContentPane(),searchLbl,GridBagConstraints.BOTH,0,0,1,1,0.0f,0.0f);
@@ -94,7 +134,9 @@ public class ArchiveConsole {
             }
         });
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Archive List Panel">
     private JPanel createArchiveListPanel(){
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -106,12 +148,12 @@ public class ArchiveConsole {
 
 
 
-        JTable cdRecordTable = new JTable();
+        cdRecordTable = new JTable();
         cdRecordTable.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
                 selectedIndex = cdRecordTable.getSelectedRow();
-                CDRecord selectedRecord = records.get(selectedIndex);
+                selectedRecord = records.get(selectedIndex);
                 //txtTitle.setText(selectedRecord.getTitle())
                 txttitle.setText(selectedRecord.getTitle());
                 txtauthor.setText(selectedRecord.getAuthor());
@@ -160,6 +202,11 @@ public class ArchiveConsole {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 BubbleSort.sort(records);
+                // This button also seeds the binary tree in order to randomize the barcodes
+                tree=new BinaryTree();
+                for (CDRecord record: records){
+                    tree.insert(new Trees.BinaryTree.Node(record.getBarcode(), record));
+                }
                 tableData.fireTableDataChanged();
             }
         });
@@ -185,7 +232,9 @@ public class ArchiveConsole {
         addComponent(panel,sortByBarcodeButton, GridBagConstraints.VERTICAL,3,2,1,1,0.0f,0.0f, new Insets(0,10,0,0), GridBagConstraints.WEST);
         return panel;
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Process Log Panel">
     private JPanel createProcessLogPanel(){
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -193,31 +242,153 @@ public class ArchiveConsole {
 
         JLabel ProcessLbl = new JLabel("Process Log: ");
         addComponent(panel, ProcessLbl, GridBagConstraints.BOTH, 0,0,4,1,100.0f,0.0f);
-        JButton Processbtn = new JButton("Process Log");
+        Processbtn = new JButton("Process Log");
         addComponent(panel,Processbtn,GridBagConstraints.BOTH , 4,0,1,1,15.0f,0f);
-        JTextField Process=new JTextField();
-        addComponent(panel,Process,GridBagConstraints.BOTH,0,1,5,4,20.0f,1.0f);
+        Processbtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+
+
+                processList.setText(Dll.toString());
+
+
+            }
+        });
+
+        //this.Process=new JList();
+        processList =new JTextArea(8,20);
+        processList.setLineWrap(true);
+        JScrollPane process=new JScrollPane(processList);
+        addComponent(panel,process,GridBagConstraints.BOTH,0,1,5,4,20.0f,1.0f);
         JLabel Binary = new JLabel("Display Binary Tree:");
         addComponent(panel,Binary,GridBagConstraints.BOTH,0,9,1,1,15.0f,0f);
         JButton Preorder= new JButton("Pre-Order");
+        // Pre order
+        Preorder.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+
+                //processList.setText(tree.traversePreOrder().toString());
+
+                tree=new BinaryTree();
+                for (CDRecord record: records){
+                    tree.insert(new Trees.BinaryTree.Node(record.getBarcode(), record));
+
+                }
+                ArrayList<BinaryTree.Node> treeArray = tree.traversePreOrder();
+                for (int i = 0; i<treeArray.size(); i++){
+
+                    processList.append(treeArray.get(i).toString()+  "\n");
+
+
+                }
+
+
+            }
+        });
+
         addComponent(panel,Preorder,GridBagConstraints.BOTH,1,9,1,1,15f,0f);
         JButton Inorder= new JButton("In-Order");
+        // In order
+        Inorder.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                tree=new BinaryTree();
+                for (CDRecord record: records){
+                    tree.insert(new Trees.BinaryTree.Node(record.getBarcode(), record));
+
+                }
+                ArrayList<BinaryTree.Node> treeArray = tree.traverseInOrder();
+                for (int i = 0; i<treeArray.size(); i++){
+
+                    processList.append(treeArray.get(i).toString()+  "\n");
+
+                }
+            }
+        });
+
+
         addComponent(panel,Inorder,GridBagConstraints.BOTH,2,9,1,1,15f,0f,new Insets(0,5,0,0),GridBagConstraints.WEST);
         JButton Postorder= new JButton("Post-Order");
+        // Post Order
+        Postorder.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                tree=new BinaryTree();
+                for (CDRecord record: records){
+                    tree.insert(new Trees.BinaryTree.Node(record.getBarcode(), record));
+
+                }
+                ArrayList<BinaryTree.Node> treeArray = tree.traversePostOrder();
+                for (int i = 0; i<treeArray.size(); i++){
+
+                    processList.append(treeArray.get(i).toString()+  "\n");
+
+                }
+            }
+        });
         addComponent(panel,Postorder,GridBagConstraints.BOTH,3,9,1,1,15f,0f,new Insets(0,5,0,0),GridBagConstraints.WEST);
         JButton Graphical= new JButton("Graphical");
         addComponent(panel,Graphical,GridBagConstraints.BOTH,4,9,1,1,15f,0f,new Insets(0,5,0,0),GridBagConstraints.WEST);
         JLabel HashMap = new JLabel("HashMap / Set:");
         addComponent(panel,HashMap,GridBagConstraints.BOTH,0,10,1,1,15.0f,0f);
         JButton Save= new JButton("Save");
+        Save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+
+                    HashMap<Integer, String> hashMap =new HashMap<>();
+                    for (int i= 0; i<records.size(); i++){
+                        hashMap.put(records.get(i).getBarcode(), records.get(i).getTitle() + "\n");
+                    }
+                    FileWriter fw =new FileWriter("HashMapFile.Data");
+                    fw.write(hashMap.toString());
+                    fw.close();
+
+
+
+                      //Simple Solution to Save Hash Map as Text file, using another method
+                    // from RecordStorage.
+                    //RecordStorage.saveHashMap("recordsHashMap3.Data", processList.getText());
+
+
+
+                } catch (Exception e){
+                    System.err.println("Failed to save records:" +e.toString());
+                }
+
+
+
+
+
+            }
+        });
         addComponent(panel,Save,GridBagConstraints.BOTH,1,10,1,1,15f,0f);
         JButton Display= new JButton("Display");
+        Display.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                 hashMap = new HashMap<>();
+                for (int i=0; i< records.size(); i++){
+                    hashMap.put(records.get(i).getBarcode(), records.get(i).getTitle() +"\n");
+                    processList.setLineWrap(true);
+                }
+                processList.setText("");
+                processList.append("HashMap: <<" + hashMap.toString() + ">>" + "\n");
+                processList.setLineWrap(true);
+            }
+        });
         addComponent(panel,Display,GridBagConstraints.BOTH,2,10,1,1,15f,0f);
 
         return panel;
     }
+    //</editor-fold>
 
 
+    //<editor-fold desc="Record Panel">
     private JPanel createRecordPanel(){
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -291,11 +462,24 @@ public class ArchiveConsole {
                             txtdesc.getText(),
                             false);
 
+                    RecordStorage.saveRecordList("recordsNEW.Data", records);
+
+
+
+
+
+
                             records.add(focusRecord);
 
 
 
                 } else {
+                    tableData.setValueAt(txttitle.getText(), selectedIndex,0);
+                    tableData.setValueAt(txtauthor.getText(), selectedIndex,1);
+                    tableData.setValueAt(txtxLoc.getText(), selectedIndex,2);
+                    tableData.setValueAt(txtyLoc.getText(), selectedIndex,3);
+                    tableData.setValueAt(txtBarcode.getText(), selectedIndex,4);
+                    tableData.setValueAt(txtdesc.getText(), selectedIndex,5);
                     records.get(selectedIndex).setTitle(txttitle.getText());
                     records.get(selectedIndex).setAuthor(txtauthor.getText());
                     records.get(selectedIndex).setSection(txtsection.getText());
@@ -306,8 +490,11 @@ public class ArchiveConsole {
 
 
                     //focusRecord.setTitle(txttitle.getText());
+
                 }
 
+                tableData.fireTableDataChanged();
+                RecordStorage.saveRecordList("recordsNEW.Data", records);
 
 
 
@@ -318,9 +505,11 @@ public class ArchiveConsole {
 
         return panel;
     }
+    //</editor-fold>
 
 
 
+    //<editor-fold desc="Action Request Panel">
     private JPanel createActionRequestPanel(){
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -328,28 +517,87 @@ public class ArchiveConsole {
         JLabel titleLbl = new JLabel("Automation Action Request for the item above:");
         addComponent(panel, titleLbl, GridBagConstraints.BOTH, 2,0,8,1,70.0f,10f);
         JButton Retrieve = new JButton("Retrieve");
+
+        Retrieve.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (selectedRecord ==null){
+                    client.sendMessage("Select a record to retrieve");
+                }
+                client.sendMessage("Retrieving: " + selectedRecord.getTitle() + "\n");
+            }
+        });
         addComponent(panel, Retrieve,GridBagConstraints.HORIZONTAL,2,1,2,1,50.0f,10f);
         JButton Remove = new JButton("Remove");
+        Remove.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (selectedRecord ==null){
+                    client.sendMessage("Select a record to remove");
+                }
+                client.sendMessage("Removing: " + selectedRecord.getTitle() + "\n");
+            }
+        });
         addComponent(panel, Remove,GridBagConstraints.HORIZONTAL,4,1,1,1,30f,10f, new Insets(0,0,0,80), GridBagConstraints.NORTH);
         JButton Return = new JButton("Return");
+        Return.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (selectedRecord ==null){
+                    client.sendMessage("Select a record to return");
+                }
+                client.sendMessage("Returning " + selectedRecord.getTitle() + "\n");
+            }
+        });
         addComponent(panel, Return,GridBagConstraints.HORIZONTAL,2,2,2,1,50.0f,10f);
         JButton addCollection = new JButton("Add to Collection");
+        addCollection.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (selectedRecord ==null){
+                    client.sendMessage("Select a record to add");
+                }
+                client.sendMessage("Adding: " + selectedRecord.getTitle() + "\n");
+
+
+            }
+        });
         addComponent(panel, addCollection,GridBagConstraints.HORIZONTAL,4,2,1,1,30f,10f,new Insets(0,0,0,80), GridBagConstraints.NORTH);
 
-        JLabel SortS = new JLabel("Sort Secion: ");
+        JLabel SortS = new JLabel("Sort Section: ");
         addComponent(panel,SortS,GridBagConstraints.HORIZONTAL,3,3,2,1,15.0f,50f );
         JTextField SectionTxt = new JTextField();
         addComponent(panel, SectionTxt,GridBagConstraints.HORIZONTAL,4,3,2,1,15.0f,50f,new Insets(0,0,0,10), GridBagConstraints.NORTH);
         JButton Random = new JButton("Random Collection Sort");
+        Random.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JOptionPane.showMessageDialog(window, "Sorting a collection");
+            }
+        });
         addComponent(panel,Random,GridBagConstraints.HORIZONTAL,4,4,1,1,15.0f,50f,new Insets(0,0,0,10), GridBagConstraints.NORTH);
         JButton Mostly = new JButton("Mostly Sorted Sort");
+        Mostly.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JOptionPane.showMessageDialog(window, "Mostly sorting");
+            }
+        });
         addComponent(panel,Mostly,GridBagConstraints.HORIZONTAL,4,5,1,1,15.0f,50f,new Insets(0,0,0,10), GridBagConstraints.NORTH);
         JButton Reverse = new JButton("Reverse Order Sort");
+        Reverse.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JOptionPane.showMessageDialog(window, "Reversing the order Sort");
+            }
+        });
         addComponent(panel,Reverse,GridBagConstraints.HORIZONTAL,4,6,1,1,15.0f,50f,new Insets(0,0,0,10), GridBagConstraints.NORTH);
 
         return panel;
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Grid Bag Layout">
     private <C extends Component> void addComponent(
             Container contentPane, C component, int fill, int gridx, int gridy,
             int gridwidth, int gridheight, float weightx, float weighty
@@ -384,7 +632,9 @@ public class ArchiveConsole {
 
         contentPane.add(component, constraints);
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Frame">
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -394,6 +644,21 @@ public class ArchiveConsole {
         });
     }
 
+
+void AutomationConsole(int row) {
+    this.CDAutomation();
+}
+
+    void CDAutomation(){
+    SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run(){
+            new AutomationConsole();
+
+        }
+    });
+   }
+    //</editor-fold>
 
 
 }

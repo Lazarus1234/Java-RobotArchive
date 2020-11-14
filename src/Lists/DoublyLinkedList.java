@@ -24,20 +24,13 @@ public class DoublyLinkedList
         System.out.println(myList.toString());
         myList.insertbefore(myList.find("d"), new DoublyLinkedList.Node("XX"));
         System.out.println(myList.toStringReverse());
-
-
-
         myList.insertbefore(myList.find("e"), new DoublyLinkedList.Node("+"));
         System.out.println(myList.toString());
-
-
-
         System.out.println(myList.toStringReverse());
         myList.insertbefore(myList.find("f"), new DoublyLinkedList.Node("p"));
         System.out.println(myList.toString());
         //myList.insertbefore(myList.find("d"), new DoublyLinkedList.Node("o"));
         //System.out.println(myList.toString());
-
         myList.Remove(myList.find("p"));
         System.out.println(myList.toString());
         System.out.println(myList.toStringReverse());
@@ -249,7 +242,7 @@ public class DoublyLinkedList
     public String toString()
     {
         Node focusNode = this.head;
-        String str = "Linked List ";
+        String str = "";
         while (focusNode.previous !=null)
         {
             focusNode = focusNode.previous;
@@ -259,7 +252,7 @@ public class DoublyLinkedList
             str += focusNode.data.toString();
             if (focusNode.next !=null)
             {
-                str += "<=>";
+                str += "\n";
             }
             focusNode = focusNode.next;
         }
@@ -268,7 +261,7 @@ public class DoublyLinkedList
 public String toStringReverse()
 {
     Node focusNode = this.tail;
-    String strr = "Reversed Linked List ";
+    String strr = " ";
     while (focusNode.next !=null)
     {
         focusNode = focusNode.next;
@@ -278,7 +271,7 @@ public String toStringReverse()
         strr += focusNode.data.toString();
         if (focusNode.previous !=null)
         {
-            strr += "<=>";
+            strr += "\n";
         }
         focusNode = focusNode.previous;
     }

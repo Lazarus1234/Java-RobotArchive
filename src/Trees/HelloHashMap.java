@@ -1,4 +1,4 @@
-package Experiments;
+package Trees;
 import java.util.HashMap;
 import java.util.Scanner;
 

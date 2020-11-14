@@ -87,6 +87,8 @@ public class BinaryTree {
             this.insert(node);
     }
 
+    public BinaryTree() {}
+
     //constructor from list
 
 
