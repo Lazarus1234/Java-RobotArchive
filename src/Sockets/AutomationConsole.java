@@ -23,8 +23,27 @@ public class AutomationConsole {
     Client client =new Client("localhost:20000", new MessageListener() {
         @Override
         public void message(String msg, MessageSender sender) {
+            System.out.println(msg);
+
+
+
             if (msg.contains("Sort")){
+                String sectionText = msg.split(":") [0];
                 JOptionPane.showMessageDialog(window, "Sorting");
+
+
+            } else {
+                String [] msgSplit = msg.split(":");
+
+                field.setText(msgSplit[1]);
+                sectfield.setText(msgSplit[2]);
+                switch (msgSplit[0]){
+                    case "Add": cboAction.setSelectedIndex(0); break;
+                    case "Retrieve": cboAction.setSelectedIndex(1); break;
+                    case "Return": cboAction.setSelectedIndex(2); break;
+                    case "Remove": cboAction.setSelectedIndex(3); break;
+                    case "Sort": cboAction.setSelectedIndex(4); break;
+                }
             }
 
         }
@@ -34,6 +53,7 @@ public class AutomationConsole {
     JTable cdRecordTable;
     AbstractTableModel tableData;
     CDRecord selectedRecord;
+    JComboBox cboAction;
 
 
     ArrayList<String> chatHistoryData;
@@ -64,7 +84,7 @@ public class AutomationConsole {
     private void createUI() {
         JLabel currentAction = new JLabel("Current Requested Action");
         addComponent(window.getContentPane(), currentAction, GridBagConstraints.BOTH, 0, 0, 2, 1, 20f, 0f);
-        JComboBox cboAction = new JComboBox(ActionList);
+        cboAction = new JComboBox(ActionList);
         cboAction.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -91,6 +111,10 @@ public class AutomationConsole {
                 if (client !=null) {
                     client.sendMessage(outMessage);
                 }
+
+                field.setText("");
+                sectfield.setText("");
+                cboAction.setSelectedIndex(0);
 
 
 

@@ -324,7 +324,7 @@ public class ArchiveConsole {
                 ArrayList<BinaryTree.Node> treeArray = tree.traversePostOrder();
                 for (int i = 0; i<treeArray.size(); i++){
 
-                    processList.append(treeArray.get(i).toString()+  "\n");
+                    processList.append(treeArray.get(i).toString() +  "\n");
 
                 }
             }
@@ -523,8 +523,10 @@ public class ArchiveConsole {
             public void actionPerformed(ActionEvent actionEvent) {
                 if (selectedRecord ==null){
                     client.sendMessage("Select a record to retrieve");
+
                 }
-                client.sendMessage("Retrieving: " + selectedRecord.getTitle() + "\n");
+
+                client.sendMessage(   "Retrieve:" + selectedRecord.getBarcode()+ ":" +selectedRecord.getSection() );
             }
         });
         addComponent(panel, Retrieve,GridBagConstraints.HORIZONTAL,2,1,2,1,50.0f,10f);
@@ -535,7 +537,7 @@ public class ArchiveConsole {
                 if (selectedRecord ==null){
                     client.sendMessage("Select a record to remove");
                 }
-                client.sendMessage("Removing: " + selectedRecord.getTitle() + "\n");
+                client.sendMessage(  "Remove:"  + selectedRecord.getBarcode()+ ":" +selectedRecord.getSection() );
             }
         });
         addComponent(panel, Remove,GridBagConstraints.HORIZONTAL,4,1,1,1,30f,10f, new Insets(0,0,0,80), GridBagConstraints.NORTH);
@@ -546,7 +548,7 @@ public class ArchiveConsole {
                 if (selectedRecord ==null){
                     client.sendMessage("Select a record to return");
                 }
-                client.sendMessage("Returning " + selectedRecord.getTitle() + "\n");
+                client.sendMessage(   "Return:" +selectedRecord.getBarcode()+ ":" +selectedRecord.getSection() );
             }
         });
         addComponent(panel, Return,GridBagConstraints.HORIZONTAL,2,2,2,1,50.0f,10f);
@@ -557,7 +559,7 @@ public class ArchiveConsole {
                 if (selectedRecord ==null){
                     client.sendMessage("Select a record to add");
                 }
-                client.sendMessage("Adding: " + selectedRecord.getTitle() + "\n");
+                client.sendMessage(   "Add:" +selectedRecord.getBarcode()+ ":" +selectedRecord.getSection() );
 
 
             }
@@ -573,6 +575,7 @@ public class ArchiveConsole {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 JOptionPane.showMessageDialog(window, "Sorting a collection");
+                client.sendMessage(   "Sort:" +selectedRecord.getBarcode()+ ":" +selectedRecord.getSection() );
             }
         });
         addComponent(panel,Random,GridBagConstraints.HORIZONTAL,4,4,1,1,15.0f,50f,new Insets(0,0,0,10), GridBagConstraints.NORTH);
@@ -640,7 +643,9 @@ public class ArchiveConsole {
             @Override
             public void run() {
                 new ArchiveConsole();
+                new AutomationConsole();
             }
+
         });
     }
 
