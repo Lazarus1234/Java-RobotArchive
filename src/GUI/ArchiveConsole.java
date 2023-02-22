@@ -238,7 +238,7 @@ public class ArchiveConsole {
     private JPanel createProcessLogPanel(){
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
-        panel.setBackground(Color.GREEN);
+        panel.setBackground(Color.YELLOW);
 
         JLabel ProcessLbl = new JLabel("Process Log: ");
         addComponent(panel, ProcessLbl, GridBagConstraints.BOTH, 0,0,4,1,100.0f,0.0f);
@@ -260,7 +260,7 @@ public class ArchiveConsole {
         processList =new JTextArea(8,20);
         processList.setLineWrap(true);
         JScrollPane process=new JScrollPane(processList);
-        addComponent(panel,process,GridBagConstraints.BOTH,0,1,5,4,20.0f,1.0f);
+        addComponent(panel,process,GridBagConstraints.BOTH,1,1,5,4,20.0f,1.0f);
         JLabel Binary = new JLabel("Display Binary Tree:");
         addComponent(panel,Binary,GridBagConstraints.BOTH,0,9,1,1,15.0f,0f);
         JButton Preorder= new JButton("Pre-Order");
